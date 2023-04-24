@@ -14,7 +14,7 @@ Python:
 - install C++ Build Tools (Build for Desktop)
 - On Windows: install Nvidia CUDA Toolkit 
 - activate your environment and install the requierement.txt
-- paste the custom bin folder from this repo to your lama folder
+- paste the subfolders inside "lama" from this repo to your lama folder
 - launch the server_windows.py or server.py
 
 # Acknowledgement
