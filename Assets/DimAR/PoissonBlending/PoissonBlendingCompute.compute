@@ -1,0 +1,57 @@
+﻿// Poisson Blending on GPU
+// http://cs.brown.edu/courses/csci1950-g/results/proj2/edwallac/
+
+#pragma kernel PoissonBlending
+#pragma kernel Init
+
+Texture2D<float4> Source;
+Texture2D<float4> Mask;
+Texture2D<float4> Target;
+RWTexture2D<float4> Result;
+
+
+inline float3 solve(in float3 center, in float3 centerD, in uint2 tid)
+{
+	float3 c = (Mask[tid].r > 0.0) ? Result[tid].rgb : Source[tid].rgb;
+	float3 gradSrc = center - Source[tid].rgb;
+	return c + gradSrc;
+
+	float3 gradDst = centerD - Target[tid].rgb;
+	return Result[tid].rgb + gradSrc * 1.0 + gradDst * 0;
+}
+
+[numthreads(16, 16, 1)]
+void Init(uint2 tid : SV_DispatchThreadID)
+{
+	// Init with target
+	Result[tid] = Target[tid];
+}
+
+[numthreads(16, 16, 1)]
+void PoissonBlending(uint2 tid : SV_DispatchThreadID)
+{
+	float width, height;
+	Result.GetDimensions(width, height);
+
+	float mask = Mask[tid].x;
+	// Filter edge case
+	if (mask < 0.1
+		|| tid.x == 0 || tid.y == 0
+		|| tid.x >= (uint)(width - 1.0) || tid.y >= (uint)(height - 1.0))
+	{
+		// Outside of the mask area
+		return;
+	}
+
+	float3 src = Source[tid].rgb;
+	float3 dst = Target[tid].rgb;
+
+	float3 sum = float3(0.0, 0.0, 0.0);
+	sum += solve(src, dst, tid + uint2(1, 0)); // right
+	sum += solve(src, dst, tid + uint2(-1, 0)); // left
+	sum += solve(src, dst, tid + uint2(0, 1)); // up
+	sum += solve(src, dst, tid + uint2(0, -1)); // down
+
+	Result[tid] = float4(sum *0.25, 1.0) ;
+
+}
