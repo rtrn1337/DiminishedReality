@@ -15,6 +15,7 @@ Python:
 - On Windows: install Nvidia CUDA Toolkit 
 - activate your environment and install the requierement.txt
 - paste the subfolders inside "lama" from this repo to your lama folder
+- create two folders inside the "lama" folder named "fromdevice" and "output"
 - launch the server.py in your environment
 
 App:
