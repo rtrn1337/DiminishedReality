@@ -17,6 +17,12 @@ Python:
 - paste the subfolders inside "lama" from this repo to your lama folder
 - launch the server.py in your environment
 
+App:
+- launche the app on your device 
+- consider that the server machine and the device are in the same local network
+- enter the ip adress from the server host into the app
+- launch a scene trough the main menu (LiDAR Scene is only available on a compatible device)
+
 # Acknowledgement
 [LaMa: Resolution-robust Large Mask Inpainting with Fourier Convolutions](https://github.com/advimman/lama)
  
