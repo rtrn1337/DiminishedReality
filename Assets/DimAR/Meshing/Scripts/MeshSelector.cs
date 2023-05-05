@@ -154,4 +154,27 @@ public class MeshSelector : MonoBehaviour
         {
             _alloMeshselection = val;
         }
+
+        GameObject Merge(GameObject[] objects, string nameNewMesh, bool disbaleOldMeshes = true)
+        {
+            CombineInstance[] combine = new CombineInstance[objects.Length];
+            MeshFilter meshFilter;
+            for (int i = 0; i < objects.Length; i++)
+            {
+                GameObject o2m = objects[i];
+                meshFilter = o2m.GetComponent<MeshFilter>();
+                combine[i].mesh = meshFilter.sharedMesh;
+                combine[i].transform = meshFilter.transform.localToWorldMatrix;
+                o2m.SetActive(!disbaleOldMeshes);
+            }
+
+            Mesh mesh = new Mesh();
+            mesh.CombineMeshes(combine);
+            GameObject gameObject = new GameObject(nameNewMesh);
+            meshFilter = gameObject.AddComponent<MeshFilter>();
+            MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
+            meshRenderer.material = new Material(Shader.Find("Diffuse"));
+            meshFilter.sharedMesh = mesh;
+            return gameObject;
+        }
     }
