@@ -12,7 +12,7 @@ public class MeshSelector : MonoBehaviour
     {
         public ARRaycastManager m_RaycastManager;
         public Color defaultColor = Color.cyan;
-        public Color selectedColor = Color.green;
+        public Color selectedColor = Color.red;
         static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();
         private Vector3 _current;
         private Camera _mCam;
@@ -79,15 +79,16 @@ public class MeshSelector : MonoBehaviour
                     {
                         selectedSubGameObjects.Remove(hit.collider.gameObject);
                         hittedObjectMeshRenderer.material.SetColor("_Color", defaultColor); 
-                        hittedObjectMeshRenderer.material.SetFloat("_Pulse",1);
+                        
+                        Debug.Log("Set Color of selected " + hittedObjectMeshRenderer.gameObject.name + " to Default");
                         hittedObjectMeshRenderer.enabled = false;
                     }
                     else
                     {
                         selectedSubGameObjects.Add(hit.collider.gameObject);
                         // none selected previous so set new as selected  
-                        hittedObjectMeshRenderer.material.SetColor("_Color", selectedColor); 
-                        hittedObjectMeshRenderer.material.SetFloat("_Pulse",0);
+                        Debug.Log("Set Color of selected " + hittedObjectMeshRenderer.gameObject.name + " to REED");
+                        hittedObjectMeshRenderer.material.SetColor("_Color", new Color(255,0,0,0));
                         hittedObjectMeshRenderer.enabled = true;
                     } 
                 }
@@ -154,7 +155,7 @@ public class MeshSelector : MonoBehaviour
         
         private void InvisibleAllSubmeshes()
         { 
-            if(selectedSubGameObjects.Count == 0) return;
+            if(selectedSubGameObjects.Count == 0) return; 
             foreach (GameObject go in selectedSubGameObjects)
             { 
                 go.GetComponent<MeshRenderer>().material.SetColor("_Color", new Color(0,0,0,0));

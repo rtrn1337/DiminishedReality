@@ -14,7 +14,12 @@ Shader "Custom/MeshingOverlay" {
 	{
 		Tags{ "RenderType" = "Transparent" }
 		LOD 100
-    Blend One One
+		Blend One One
+		  // extra pass that renders to depth buffer only
+    Pass {
+        ZWrite On
+        ColorMask 0
+    }
 		Pass
 	{
 		CGPROGRAM
@@ -131,7 +136,7 @@ Shader "Custom/MeshingOverlay" {
 			c *= smoothstep(border - 3.0, border - 0.5, d);
 			// fade out
 			 c *= smoothstep(5.0, 4.0, border);
-			return c*_Color * .45 + c2 *_Color * .15 ;
+			return c*_Color * .2 + c2 *_Color * .4 ;
 		}
 
 		fixed4 frag(v2f i) : SV_Target

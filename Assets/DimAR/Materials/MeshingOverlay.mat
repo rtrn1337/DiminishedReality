@@ -9,6 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: MeshingOverlay
   m_Shader: {fileID: 4800000, guid: 958863180e25647a19c45c4bf1725826, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords:
   - ENUM_5312DE06_NONE
@@ -20,6 +22,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -94,9 +97,9 @@ Material:
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
-    - _Speed: 1.03
+    - _Speed: 1
     - _SrcBlend: 1
-    - _TrianglesScale: 2.5
+    - _TrianglesScale: 1.22
     - _UVSec: 0
     - _WireframeShader_Diameter: 1
     - _WireframeShader_Smoothness: 0
@@ -107,7 +110,7 @@ Material:
     - Color_1221528D: {r: 0, g: 0, b: 0, a: 0}
     - Color_6F4043B5: {r: 0, g: 0, b: 0, a: 0}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Center: {r: 0, g: -1, b: 3, a: 1}
+    - _Center: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 0, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _PlaneColor: {r: 1, g: 0, b: 0, a: 0.8156863}
