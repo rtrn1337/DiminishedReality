@@ -12,7 +12,7 @@ public class MeshSelector : MonoBehaviour
     {
         public ARRaycastManager m_RaycastManager;
         public Color defaultColor = Color.cyan;
-        public Color selectedColor = Color.red;
+        public Color selectedColor = Color.green;
         static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();
         private Vector3 _current;
         private Camera _mCam;
@@ -72,21 +72,23 @@ public class MeshSelector : MonoBehaviour
                 {
                     TextureGenerator.loopInpaint = false;
                     MeshRenderer hittedObjectMeshRenderer = hit.collider.gameObject.GetComponent<MeshRenderer>(); 
+                    hittedObjectMeshRenderer.material = overlayMaterial;
                     Destroy(_mergedObject);
-                    ActivateAllExistingTrackables();
+                    ActivateAllExistingTrackablesInMegaMesh();
                     if (selectedSubGameObjects.Contains(hit.collider.gameObject))
                     {
-                        selectedSubGameObjects.Remove(hit.collider.gameObject);  
-                        hittedObjectMeshRenderer.material = overlayMaterial;
-                        hittedObjectMeshRenderer.material.SetColor("_Color", defaultColor);
+                        selectedSubGameObjects.Remove(hit.collider.gameObject);
+                        hittedObjectMeshRenderer.material.SetColor("_Color", defaultColor); 
                         hittedObjectMeshRenderer.material.SetFloat("_Pulse",1);
+                        hittedObjectMeshRenderer.enabled = false;
                     }
                     else
                     {
                         selectedSubGameObjects.Add(hit.collider.gameObject);
-                        // none selected previous so set new as selected 
+                        // none selected previous so set new as selected  
                         hittedObjectMeshRenderer.material.SetColor("_Color", selectedColor); 
                         hittedObjectMeshRenderer.material.SetFloat("_Pulse",0);
+                        hittedObjectMeshRenderer.enabled = true;
                     } 
                 }
                 else
@@ -99,21 +101,22 @@ public class MeshSelector : MonoBehaviour
         public void DoMeshingInPaint()
         {
             if(selectedSubGameObjects.Count == 0) return;
-            _mergedObject = Merge(selectedSubGameObjects, "inpaintTarget");
+            _mergedObject = Merge(selectedSubGameObjects, "inpaintTarget",false);
             _mergedObject.layer = 10;
-            _mergedObject.GetComponent<MeshRenderer>().material = inpaintMaterial;
+            _mergedObject.GetComponent<MeshRenderer>().material = inpaintMaterial; 
             TextureGenerator.mr = _mergedObject.GetComponent<MeshRenderer>();
             TextureGenerator.drawnMesh = _mergedObject.GetComponent<MeshFilter>();
             TextureGenerator.lidarInpaint = true; 
-            DeactivateAllOtherExistingTrackables();
+            DeactivateAllOtherExistingTrackablesInMegaMesh();
             StartCoroutine(TextureGenerator.BlitTextures());
             TextureGenerator.loopInpaint = true;
-            ResetVisualOfAllExistingTrackables();
+            ResetVisualOfAllExistingTrackablesInMegaMesh();
+            InvisibleAllSubmeshes();
             selectedSubGameObjects.Clear();
             _doingInpaint = true;
         }
 
-        public void DeactivateAllOtherExistingTrackables()
+        public void DeactivateAllOtherExistingTrackablesInMegaMesh()
         {
           //  MeshFilter selectedMeshFilter = selectedRayObject.GetComponent<MeshFilter>();
             foreach (var meshFilter in m_MeshManager.meshes)
@@ -122,7 +125,7 @@ public class MeshSelector : MonoBehaviour
             }
         }
 
-        public void ActivateAllExistingTrackables()
+        public void ActivateAllExistingTrackablesInMegaMesh()
         { 
             foreach (var meshFilter in m_MeshManager.meshes)
             { 
@@ -130,7 +133,7 @@ public class MeshSelector : MonoBehaviour
             }
         }
         
-        public void ResetVisualOfAllExistingTrackables()
+        public void ResetVisualOfAllExistingTrackablesInMegaMesh()
         { 
             foreach (var meshFilter in m_MeshManager.meshes)
             { 
@@ -148,13 +151,43 @@ public class MeshSelector : MonoBehaviour
                     v.GetComponent<MeshRenderer>().enabled = false; 
             }
         }
+        
+        private void InvisibleAllSubmeshes()
+        { 
+            if(selectedSubGameObjects.Count == 0) return;
+            foreach (GameObject go in selectedSubGameObjects)
+            { 
+                go.GetComponent<MeshRenderer>().material.SetColor("_Color", new Color(0,0,0,0));
+            }
+        }
+        
 
         public void AllowMeshSelection(bool val)
         {
             _alloMeshselection = val;
         }
 
-        GameObject Merge(List<GameObject> objects, string nameNewMesh, bool disbaleOldMeshes = true)
+        public void MergeAllLidarMeshesForDebugOnly()
+        {
+            List<GameObject> lidarmeshGameObjects = new List<GameObject>();
+            foreach (var meshFilter in m_MeshManager.meshes)
+            { 
+                lidarmeshGameObjects.Add(meshFilter.gameObject);
+            }
+
+            Instantiate(Merge(lidarmeshGameObjects, "fullMesh",false));
+        }
+        
+        // <summary>
+        //Merge a list of Meshes to one - by Marcel Tiator
+        // </summary>
+        /// <param name="objects">List of gameobjects with attached meshes</param>
+        /// <param name="nameNewMesh">Name of the merged mesh</param>
+        /// <param name="disableOldMeshes">if old meshes should be disabled</param>
+        /// <returns>
+        /// Gameobject with merged Mesh
+        /// </returns>
+        GameObject Merge(List<GameObject> objects, string nameNewMesh, bool disbaleOldMeshes)
         {
             CombineInstance[] combine = new CombineInstance[objects.Count];
             MeshFilter meshFilter;
